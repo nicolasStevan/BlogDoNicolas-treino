@@ -7,5 +7,7 @@ export function AuthProvider({children,value}){ // criar o contexto
 }
 
 export function useAuthValue(){
-    return useContext(authContext)
+
+    return useContext(AuthContext)
+
 }

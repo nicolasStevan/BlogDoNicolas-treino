@@ -15,9 +15,11 @@ import Home from './pages/Home/Home'
 import About from './pages/About/About'
 //conponents
 import Footer from './components/footer'
-import Navbar from './components/navbar'
+import Navbar from './components/Navbar'
 import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
+import CreatePost from './pages/CreatePost/CreatePost'
+import Dashboard from './pages/Dashboard/Dashboard'
 
 function App() {
   const [user,setUser] = useState(undefined)
@@ -44,8 +46,10 @@ function App() {
         <Routes>
           <Route path='/' element={<Home/>}/>
           <Route path='/about' element={<About/>}/>
-          <Route path='/login' element={<Login/>}/>
-          <Route path='/register' element={<Register/>}/>
+          <Route path='/login' element={!user ? <Login/> : <Navigate to="/"/>} />
+          <Route path='/register' element={!user ? <Register/> : <Navigate to="/"/>}/>
+          <Route path='posts/create' element={user ? <CreatePost/> : <Navigate to="/"/>}/>
+          <Route path='/dashboard' element={user ? <Dashboard/> : <Navigate to="/"/>}/>
         </Routes>
       </div>
     <Footer/>
