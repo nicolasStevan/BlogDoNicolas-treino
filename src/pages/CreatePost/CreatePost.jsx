@@ -1,6 +1,6 @@
 import style from './createpost.module.css'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthValue } from '../../context/AuthContext'
 import { useInsertDocuments } from '../../hooks/useInsertDocuments'
@@ -11,6 +11,8 @@ const CreatePost = () => {
   const [image, setImage] = useState(null)
   const [tags, setTags] = useState([])
   const [formError, setFormError] = useState("")
+  const [butonName, setButonName] = useState("Criar Post")
+  const [loading, setLoading] = useState(false)
 
   const {user} = useAuthValue()
   const navigate = useNavigate()
@@ -21,15 +23,18 @@ const CreatePost = () => {
     e.preventDefault();
     setFormError(null);
 
+    setLoading(true)
+
     // Sua lógica de validação aqui
     try {
       new URL(image);
     } catch (error) {
-      setFormError('Insira uma URL válida para a imagem');
+      setLoading(false)
+    return setFormError('Insira uma URL válida para a imagem');
     }
 
     // criar array de tags
-    const tagsArray = tags.split(',').map((tag) => tag.trim());
+    const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase());
 
     //checar todos os campos
     if (!title || !body || !image || !tags) {
@@ -48,18 +53,26 @@ const CreatePost = () => {
         createdBy: user.displayName,
       });
 
-      // Exibir alerta
-      if (!response.error) {
-        alert('Post criado com sucesso!');
-      }
-
 
       // Redirecionar para a homepage
       navigate('/');
     } catch (error) {
       setFormError(error.message);
     }
+    finally{
+      setLoading(false)
+    }
   };
+
+  useEffect(() => {
+      console.log(response.loading)
+    if(loading){
+      setButonName("Aguarde...")}
+    else{
+      setButonName("Criar Post")
+    }
+  }, [loading]);
+
 
   return (
     <div className={style.create_post}>
@@ -83,19 +96,10 @@ const CreatePost = () => {
           <input type="text" name='tags' required placeholder='Insira tags para o seu post' onChange={(e) => setTags(e.target.value)} value={tags} />
         </label>
 
-         {!response.loading && <button className="btn">Criar post!</button>}
-        {response.loading && (
-          <button className="btn" disabled>
-            Aguarde.. .
-          </button>
+          <button disabled={loading} className="btn">{butonName}</button>
+        {(response?.error || formError) && (
+          <p className="error">{response?.error || formError}</p>
         )}
-        {(response.error || formError) && (
-          <p className="error">{response.error || formError}</p>
-        )}
-         {/* {(formError.error || formError) && (
-          <p className="error">{formError.error || formError}</p>
-        )} */}
-
       </form>
     
     </div>

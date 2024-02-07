@@ -1,6 +1,5 @@
 import React from 'react'
 import styles from './PostDetail.module.css'
-
 import { Link } from 'react-router-dom'
 
 const PostDetail = ({post}) => {
@@ -12,8 +11,8 @@ const PostDetail = ({post}) => {
     <div>
         {post.tagsArray.map((tag) => (
             <p key={tag}><span>#</span>{tag}</p>
-        ))}
-        {console.log(post.tagsArray)}
+            ))}
+            
     </div>
     <Link to={`posts/${post.id}`} className='btn btn-outline'>Ler</Link>
     </div>

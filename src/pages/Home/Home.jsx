@@ -19,7 +19,7 @@ const Home = () => {
     e.preventDefault();
     console.log(query);
   }
-  
+  console.log(posts)
   return (
     <div className={styles.home}>
       <h1>Veja os posts Mais Recentes</h1>
