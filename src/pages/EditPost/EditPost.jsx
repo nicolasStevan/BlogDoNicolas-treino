@@ -1,23 +1,43 @@
-import style from './createpost.module.css'
+import style from './EditPost.module.css'
 
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthValue } from '../../context/AuthContext'
-import { useInsertDocuments } from '../../hooks/useInsertDocuments'
+import { useUpdateDocuments } from '../../hooks/useUpdatedDocument'
+import { useFetchDocuments } from '../../hooks/useFetchDocuments'
 
-const CreatePost = () => {
+
+
+const EditPost = () => {
+  const {id} = useParams()
+  const {document: post} = useFetchDocuments('posts', id)
+  
+
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
-  const [image, setImage] = useState(null)
+  const [image, setImage] = useState('')
   const [tags, setTags] = useState([])
   const [formError, setFormError] = useState("")
-  const [butonName, setButonName] = useState("Criar Post")
+  const [butonName, setButonName] = useState("Editar")
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    console.log("caiu no useeffect")
+    if(post){
+      setTitle(post.title)
+      setBody(post.body)
+      setImage(post.image)
+
+      const tags = post.tagsArray.join(", ");
+      setTags(tags)
+    }
+}, [post])
+
 
   const {user} = useAuthValue()
   const navigate = useNavigate()
 
-  const {insertDocument, response} = useInsertDocuments("posts")
+  const {updateDocument, response} = useUpdateDocuments("posts")
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -43,25 +63,21 @@ const CreatePost = () => {
 
     if(formError) return;
 
-    try {
-      await insertDocument({
+     
+      const data = {
         title,
         body,
         image,
         tagsArray,
         uid: user.uid,
         createdBy: user.displayName,
-      });
+      }
 
+      updateDocument(id, data)
+      
 
       // Redirecionar para a homepage
-      navigate('/');
-    } catch (error) {
-      setFormError(error.message);
-    }
-    finally{
-      setLoading(false)
-    }
+      navigate('/dashboard');
   };
 
   useEffect(() => {
@@ -69,15 +85,17 @@ const CreatePost = () => {
     if(loading){
       setButonName("Aguarde...")}
     else{
-      setButonName("Criar Post")
+      setButonName("Editar")
     }
   }, [loading]);
 
 
   return (
-    <div className={style.create_post}>
-      <h2>Criar Post</h2>
-      <p>Escreva sobre o que quiser e compartilhe o seu conhecimento</p>
+    <div className={style.edit_post}>
+        {post && (
+          <>
+             <h2>Editar o Post: {post.title}</h2>
+      <p>Altere o que você quiser no seu Post</p>
       <form onSubmit={HandleSubmit}>
         <label>
           <span>Titulo:</span>
@@ -87,6 +105,10 @@ const CreatePost = () => {
           <span>Imagem:</span>
           <input type="text" name='image' required placeholder='Insira uma imagem que refere-se ao seu post' onChange={(e) => setImage(e.target.value)} value={image} />
         </label>
+        <p className={style.preview_title}>
+        Preview da imagem que você colocou
+        <img className={style.image_preview} src={post.image} alt={post.title} />
+        </p>
         <label>
           <span>Conteúdo:</span>
           <textarea name='body' required placeholder='Escreva o conteúdo do seu post' onChange={(e) => setBody(e.target.value)} value={body} />
@@ -102,8 +124,10 @@ const CreatePost = () => {
         )}
       </form>
     
+          </>
+        )}
     </div>
   )
 }
 
-export default CreatePost
+export default EditPost
