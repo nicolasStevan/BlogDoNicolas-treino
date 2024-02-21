@@ -12,7 +12,7 @@ const Navbar = () => {
   return (
     <nav className={style.navbar}>
         <NavLink className={style.navbar__logo}>
-            Mini <span className={style.navbar__span}>Blog</span>
+            Blog <span className={style.navbar__span}>do Nico</span>
         </NavLink>
         <ul className={style.links_style}>
             <li className={style.link_style}>
@@ -52,12 +52,12 @@ const Navbar = () => {
                 <NavLink to="/about" className={({isActive}) => isActive ? style.active : ""}>
                     Sobre
                 </NavLink>
-            </li>
             {user && (
                 <>
-                <button onClick={logout}>Sair</button>
+                <button className={({isActive}) => isActive ? style.active : ""} onClick={logout}>Sair</button>
                 </>
             )}
+            </li>
         </ul>
     </nav>
   )
